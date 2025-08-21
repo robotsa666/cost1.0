@@ -1,0 +1,6 @@
+account_id,parent_id,name
+100,,Koszty ogólne
+110,100,Utrzymanie biura
+120,100,IT
+121,120,Helpdesk
+122,120,Infrastruktura

@@ -1,19 +1,51 @@
-# 🎈 Blank app template
+# Controlling Allocation App
 
-A simple Streamlit app template for you to modify!
+Silnik alokacji kosztów wg drzewa kont – **czysty Python (CSV only)**, opcjonalny **FastAPI** oraz schemat **Supabase**.
 
-[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://blank-app-template.streamlit.app/)
+## Struktura
+```
+controlling-app/
+  backend/
+    app.py          # silnik + CLI
+    api.py          # FastAPI (opcjonalnie)
+  db/
+    schema.sql      # schemat Supabase (Postgres)
+  examples/
+    szablon_coa.csv
+    szablon_koszty.csv
+    szablon_klucze.csv
+  tests/
+    test_allocation.py
+```
 
-### How to run it on your own machine
+## Uruchomienie silnika (CLI)
+```bash
+python backend/app.py --coa examples/szablon_coa.csv \
+                      --costs examples/szablon_koszty.csv \
+                      --alloc examples/szablon_klucze.csv \
+                      --out wynik.csv
+```
 
-1. Install the requirements
+Dodatkowe opcje:
+- `--write-templates` (zapisze CSV do `examples/`)
+- `--run-tests` (uruchomi testy jednostkowe)
+- `--validate-only` (wykonuje tylko walidację planu kont)
 
-   ```
-   $ pip install -r requirements.txt
-   ```
+## API (opcjonalnie)
+```bash
+pip install fastapi uvicorn
+uvicorn backend.api:app --reload
+# POST /allocate z plikami: coa, costs, alloc (multipart/form-data, CSV)
+```
 
-2. Run the app
+## Supabase
+Skopiuj zawartość `db/schema.sql` do SQL Editor w Supabase i uruchom. Ostrzeżenie o „destructive op” dotyczy jedynie `DROP TRIGGER IF EXISTS` – to bezpieczne.
 
-   ```
-   $ streamlit run streamlit_app.py
-   ```
+## Założenia modelu
+- Klucze definiowane per konto nadrzędne. Wagi normalizowane per rodzic.
+- Jeśli brak kluczy dla rodzica – koszt zostaje na nim.
+- Alokacja iteracyjna top-down aż do braku możliwości dalszego rozksięgowania.
+- Alokacje do nie‑dzieci są ignorowane.
+
+## Licencja
+MIT
